@@ -9,12 +9,12 @@ object Application {
 			case Some("2") | None =>
 				new ImprovedHashRingRouter(3)
 			case Some("3") =>
-				new HashRingRouter()
+				new JumpHashRouter()
 			case unknown =>
 				throw new IllegalArgumentException(s"unknown value: $unknown")
 		}
 
-		val nodes = (1 to 3).map(_.toString).map(new Node(_))
+		val nodes = (1 to 3).map(new Node(_))
 		val keys = (150 to 300).map(_.toString).take(100)
 
 		nodes.foreach { node =>
