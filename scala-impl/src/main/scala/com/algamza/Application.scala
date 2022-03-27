@@ -4,17 +4,17 @@ object Application {
 
 	def main(args: Array[String]): Unit = {
 		val router: ConsistentHashRouter = args.headOption match {
-			case Some("1") | None =>
+			case Some("1") =>
 				new HashRingRouter()
-			case Some("2") =>
-				new HashRingRouter()
+			case Some("2") | None =>
+				new ImprovedHashRingRouter(3)
 			case Some("3") =>
 				new HashRingRouter()
 			case unknown =>
 				throw new IllegalArgumentException(s"unknown value: $unknown")
 		}
 
-		val nodes = (1 to 3).map(_.toString).map(NodeImpl)
+		val nodes = (1 to 3).map(_.toString).map(new Node(_))
 		val keys = (150 to 300).map(_.toString).take(100)
 
 		nodes.foreach { node =>
@@ -31,10 +31,10 @@ object Application {
 		println("------------------")
 		keys.map { key =>
 			router.getRouteNode(key)
-		}.groupBy(_.key()).map(tuple => (tuple._1, tuple._2.size))
-			.toSeq.sortBy(_._1)
+		}.groupBy(node => node).map(tuple => (tuple._1, tuple._2.size))
+			.toSeq.sortBy(_._1.toString)
 			.foreach {
-				case (node, count) => println(s"Node_$node => $count")
+				case (node, count) => println(s"$node => $count")
 			}
 	}
 }
